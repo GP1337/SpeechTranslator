@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,15 +15,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
 
 import java.util.List;
-import java.util.Set;
 
 public class LanguageListAdapter extends RecyclerView.Adapter {
 
+    private FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+
     private List<Language> languagesList = Language.getAllLanguages();
+
+    public List<Language> getLanguagesList() {
+        return languagesList;
+    }
 
     public LanguageListAdapter() {
 
@@ -32,20 +35,14 @@ public class LanguageListAdapter extends RecyclerView.Adapter {
 
             FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
 
-            Task<Boolean> booleanTask = FirebaseModelManager.getInstance().isModelDownloaded(remoteModel);
+            Task<Boolean> booleanTask = modelManager.isModelDownloaded(remoteModel);
 
-            booleanTask.addOnSuccessListener(new OnSuccessListener<Boolean>() {
-                @Override
-                public void onSuccess(Boolean aBoolean) {
-
-                    language.setModelDownloaded(aBoolean);
-
-                    notifyDataSetChanged();
-
-
-                }
+            booleanTask.addOnSuccessListener(aBoolean -> {
+                language.setModelDownloaded(aBoolean);
+                notifyDataSetChanged();
             });
         }
+
     }
 
     @NonNull
@@ -64,63 +61,45 @@ public class LanguageListAdapter extends RecyclerView.Adapter {
 
         languageViewHolder.flag.setImageResource(language.getFlagId());
 
-        languageViewHolder.progressBar.setVisibility(View.GONE);
-        languageViewHolder.download.setVisibility(View.VISIBLE);
+        languageViewHolder.setVisibility(false);
 
         if (language.isModelDownloaded()) {
 
-            languageViewHolder.download.setImageResource(R.drawable.downloaded);
+            languageViewHolder.download.setImageResource(0);
             languageViewHolder.download.setOnClickListener(null);
 
         } else {
 
             languageViewHolder.download.setImageResource(R.drawable.download);
-            languageViewHolder.download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            languageViewHolder.download.setOnClickListener(view -> {
 
-                    languageViewHolder.progressBar.setVisibility(View.VISIBLE);
-                    languageViewHolder.download.setVisibility(View.GONE);
+                languageViewHolder.setVisibility(true);
 
+                FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
 
-                    FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+                FirebaseTranslateRemoteModel remoteModel =
+                        new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
 
-                    FirebaseTranslateRemoteModel remoteModel =
-                            new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+                FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+                        .requireWifi()
+                        .build();
 
-                    FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
-                            .requireWifi()
-                            .build();
+                modelManager.download(remoteModel, conditions)
+                        .addOnSuccessListener(v -> {
 
-                    modelManager.download(remoteModel, conditions)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void v) {
+                            language.setModelDownloaded(true);
 
-                                    language.setModelDownloaded(true);
+                            notifyDataSetChanged();
 
-                                    notifyDataSetChanged();
+                            languageViewHolder.setVisibility(false);
+                            languageViewHolder.download.setOnClickListener(null);
+                        })
+                        .addOnFailureListener(e -> languageViewHolder.setVisibility(false));
 
-                                    languageViewHolder.progressBar.setVisibility(View.GONE);
-                                    languageViewHolder.download.setVisibility(View.VISIBLE);
-                                    languageViewHolder.download.setOnClickListener(null);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                    languageViewHolder.progressBar.setVisibility(View.GONE);
-                                    languageViewHolder.download.setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                }
             });
         }
 
         languageViewHolder.name.setText(language.getName());
-        languageViewHolder.name.setHint(language.getName());
     }
 
     @Override
@@ -142,6 +121,17 @@ public class LanguageListAdapter extends RecyclerView.Adapter {
             download = itemView.findViewById(R.id.item_list_download);
             name = itemView.findViewById(R.id.item_list_name);
             progressBar = itemView.findViewById(R.id.progress_bar);
+        }
+
+        public void setVisibility(boolean downloading){
+
+            if (downloading) {
+                progressBar.setVisibility(View.VISIBLE);
+                download.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.GONE);
+                download.setVisibility(View.VISIBLE);
+            }
         }
 
     }

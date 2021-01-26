@@ -55,21 +55,16 @@ public class LanguagesListActivity extends AppCompatActivity {
                             new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
 
                     modelManager.deleteDownloadedModel(model)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void v) {
+                            .addOnSuccessListener(v -> {
 
-                                    language.setModelDownloaded(false);
-                                    adapter.notifyDataSetChanged();
+                                language.setModelDownloaded(false);
+                                adapter.notifyDataSetChanged();
 
-                                }
                             })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    adapter.notifyDataSetChanged();
-                                    // Error.
-                                }
+                            .addOnFailureListener(e -> {
+
+                                //todo logs
+
                             });
                 }
 

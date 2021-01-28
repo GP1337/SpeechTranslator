@@ -38,8 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (preference.getKey().equals(getResources().getString(R.string.languages_key))){
 
-                Intent intent = new Intent(this.getContext(), LanguagesListActivity.class);
-
+                Intent intent = LanguagesListActivity.getSettingsIntent(getContext());
                 startActivity(intent);
 
             }

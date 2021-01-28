@@ -2,10 +2,11 @@ package com.example.voicetranslator;
 
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Language {
+public class Language implements Serializable {
 
     private String code;
     private String name;

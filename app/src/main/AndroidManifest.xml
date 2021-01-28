@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.LanguagesListActivity"></activity>
+        <activity android:name=".activity.TranslationActivity"></activity>
+        <activity android:name=".activity.LanguagesListActivity" />
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" />

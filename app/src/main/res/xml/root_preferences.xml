@@ -10,7 +10,7 @@
             app:key="default_mode"
             app:title="@string/default_offline_online_mode_title"
             app:useSimpleSummaryProvider="true"
-            android:defaultValue="1"/>
+            android:defaultValue="@string/mode_online"/>
 
         <Preference
             app:key="@string/languages_key"
@@ -19,26 +19,26 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+<!--    <PreferenceCategory app:title="@string/sync_header">-->
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="sync"-->
+<!--            app:title="@string/sync_title" />-->
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:dependency="sync"-->
+<!--            app:key="attachment"-->
+<!--            app:summaryOff="@string/attachment_summary_off"-->
+<!--            app:summaryOn="@string/attachment_summary_on"-->
+<!--            app:title="@string/attachment_title" />-->
 
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/messages_header">
+<!--    </PreferenceCategory>-->
+<!--    <PreferenceCategory app:title="@string/messages_header">-->
 
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+<!--        <EditTextPreference-->
+<!--            app:key="signature"-->
+<!--            app:title="@string/signature_title"-->
+<!--            app:useSimpleSummaryProvider="true" />-->
 
 <!--        <ListPreference-->
 <!--            app:defaultValue="reply"-->
@@ -48,20 +48,20 @@
 <!--            app:title="@string/reply_title"-->
 <!--            app:useSimpleSummaryProvider="true" />-->
 
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/sync_header">
+<!--    </PreferenceCategory>-->
+<!--    <PreferenceCategory app:title="@string/sync_header">-->
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="sync"-->
+<!--            app:title="@string/sync_title" />-->
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:dependency="sync"-->
+<!--            app:key="attachment"-->
+<!--            app:summaryOff="@string/attachment_summary_off"-->
+<!--            app:summaryOn="@string/attachment_summary_on"-->
+<!--            app:title="@string/attachment_title" />-->
 
-    </PreferenceCategory>
+<!--    </PreferenceCategory>-->
 
 </PreferenceScreen>

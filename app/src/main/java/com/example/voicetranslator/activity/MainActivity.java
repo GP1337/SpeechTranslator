@@ -104,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
                 ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-                translator.translate(data.get(0));
-
                 translator.translate(data.get(0))
                         .addOnSuccessListener(
                                 new OnSuccessListener<String>() {

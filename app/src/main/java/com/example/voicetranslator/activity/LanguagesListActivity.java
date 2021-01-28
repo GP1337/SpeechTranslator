@@ -38,7 +38,23 @@ public class LanguagesListActivity extends AppCompatActivity {
         LanguageListAdapter adapter = new LanguageListAdapter();
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+
+                Language language = adapter.getLanguagesList().get(viewHolder.getAdapterPosition());
+
+                int dragFlags = 0;
+                int swipeFlags = 0;
+
+                if (language.isModelDownloaded()){
+                   swipeFlags = ItemTouchHelper.START;
+                }
+
+                return makeMovementFlags(dragFlags, swipeFlags);
+
+            }
+
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;

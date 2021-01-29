@@ -1,5 +1,6 @@
-package com.example.voicetranslator;
+package com.example.voicetranslator.adapter;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.voicetranslator.model.Language;
+import com.example.voicetranslator.R;
 import com.example.voicetranslator.activity.LanguagesListActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
@@ -160,7 +163,7 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
         Intent intent = new Intent();
         intent.putExtra(LanguagesListActivity.LANGUAGE_EXTRA_NAME, languagesList.get(position));
 
-        context.setResult(1, intent);
+        context.setResult(Activity.RESULT_OK, intent);
         context.finish();
 
     }

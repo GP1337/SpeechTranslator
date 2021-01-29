@@ -11,16 +11,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.voicetranslator.Language;
-import com.example.voicetranslator.LanguageListAdapter;
+import com.example.voicetranslator.model.Language;
+import com.example.voicetranslator.adapter.LanguageListAdapter;
 import com.example.voicetranslator.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
-
-import dagger.Module;
-import dagger.Provides;
 
 public class LanguagesListActivity extends AppCompatActivity {
 
@@ -73,7 +68,14 @@ public class LanguagesListActivity extends AppCompatActivity {
         LanguageListAdapter adapter = new LanguageListAdapter(mode);
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+        ItemTouchHelper.Callback callback = getCallback(adapter);
+
+        new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
+
+    }
+
+    private ItemTouchHelper.Callback getCallback(LanguageListAdapter adapter) {
+        return new ItemTouchHelper.Callback() {
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
 
@@ -121,9 +123,6 @@ public class LanguagesListActivity extends AppCompatActivity {
 
             }
         };
-
-        new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
-
     }
 
 }

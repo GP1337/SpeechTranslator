@@ -1,5 +1,6 @@
-package com.example.voicetranslator;
+package com.example.voicetranslator.model;
 
+import com.example.voicetranslator.R;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 
 import java.io.Serializable;

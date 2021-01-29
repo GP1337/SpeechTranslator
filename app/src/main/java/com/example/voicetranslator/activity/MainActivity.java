@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.example.voicetranslator.ModelManager;
 import com.example.voicetranslator.R;
-import com.example.voicetranslator.SpeechRecognitionListener;
+import com.example.voicetranslator.recognition.SpeechRecognitionListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
@@ -125,6 +125,11 @@ public class MainActivity extends AppCompatActivity {
                                         text.setText(e.toString());
                                     }
                                 });
+
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
 
             }
         });

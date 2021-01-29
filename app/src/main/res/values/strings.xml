@@ -20,6 +20,7 @@
     <string name="default_offline_online_mode_title">Default mode:</string>
     <string name="mode_online">online</string>
     <string name="mode_offline">offline</string>
+    <string name="listening">Listening...</string>
 
     <string name="languages_title">Languages(for offline mode)</string>
     <string name="languages_key">languages</string>

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.voicetranslator"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -50,6 +50,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-natural-language:22.0.0'
     implementation 'com.google.firebase:firebase-ml-natural-language-translate-model:20.0.8'
     implementation 'androidx.preference:preference:1.1.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.0.0'
+    implementation 'com.google.firebase:firebase-analytics:17.4.2'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
@@ -76,4 +78,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-
+apply plugin: 'com.google.firebase.crashlytics'

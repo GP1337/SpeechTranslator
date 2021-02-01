@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/messages_header">
+<!--    <PreferenceCategory app:title="@string/messages_header">-->
 
         <ListPreference
             app:defaultValue="reply"
@@ -11,14 +11,15 @@
             app:title="@string/default_offline_online_mode_title"
             android:summary="%s"
             app:useSimpleSummaryProvider="true"
-            android:defaultValue="@string/mode_online"/>
+            android:defaultValue="@string/mode_online"
+            />
 
         <Preference
             app:key="@string/languages_key"
             app:title="@string/languages_title"
             app:useSimpleSummaryProvider="true"/>
 
-    </PreferenceCategory>
+<!--    </PreferenceCategory>-->
 
 <!--    <PreferenceCategory app:title="@string/sync_header">-->
 

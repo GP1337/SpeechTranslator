@@ -2,7 +2,6 @@ package com.example.voicetranslator.recognition;
 
 import android.os.Bundle;
 import android.speech.RecognitionListener;
-import android.widget.TextView;
 
 public abstract class SpeechRecognitionListener implements RecognitionListener {
 
@@ -17,9 +16,6 @@ public abstract class SpeechRecognitionListener implements RecognitionListener {
 
     @Override
     public void onEndOfSpeech(){};
-
-//    @Override
-//    public void onError(int i){};
 
     @Override
     public void onEvent(int i, Bundle bundle){};

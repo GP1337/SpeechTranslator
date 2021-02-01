@@ -1,14 +1,13 @@
 package com.example.voicetranslator.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -27,7 +26,6 @@ import com.example.voicetranslator.translation.TranslatorFactory;
 import java.util.ArrayList;
 
 public class TranslationActivity extends AppCompatActivity {
-
 
     private Language language1;
     private Language language2;
@@ -76,7 +74,6 @@ public class TranslationActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -107,7 +104,9 @@ public class TranslationActivity extends AppCompatActivity {
         translatorFactory = new TranslatorFactory();
 
         setLanguage1(Language.defaultLanguage());
-        setLanguage2(Language.defaultLanguage());
+        setLanguage2(Language.getAllLanguages().get(0));
+
+        recordAudioAccessGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
 
     }
 
@@ -223,7 +222,10 @@ public class TranslationActivity extends AppCompatActivity {
     }
 
     private void checkPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.INTERNET}, RECORD_AUDIO_REQUEST_CODE);
     }
 
     private SpeechRecognitionListener speechRecognitionListener(){

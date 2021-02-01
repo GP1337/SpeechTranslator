@@ -73,7 +73,6 @@ public class Language implements Serializable {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public static Language defaultLanguage(){
 
         List<Language> list = getAllLanguages();

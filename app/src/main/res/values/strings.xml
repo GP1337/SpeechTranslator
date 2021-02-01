@@ -23,6 +23,7 @@
     <string name="mode_online">online</string>
     <string name="mode_offline">offline</string>
     <string name="listening">Listening...</string>
+    <string name="offline_mode_warning">Download packages for offline mode</string>
 
     <string name="languages_title">Languages(for offline mode)</string>
     <string name="languages_key">languages</string>

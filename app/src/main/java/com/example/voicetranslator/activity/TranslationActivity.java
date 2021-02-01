@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeechService;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,13 +23,8 @@ import com.example.voicetranslator.R;
 import com.example.voicetranslator.recognition.SpeechRecognitionListener;
 import com.example.voicetranslator.translation.FirebaseTranslator;
 import com.example.voicetranslator.translation.Translator;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-
-import org.w3c.dom.Text;
-
+import com.example.voicetranslator.translation.TranslatorFactory;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class TranslationActivity extends AppCompatActivity {
 
@@ -52,8 +46,12 @@ public class TranslationActivity extends AppCompatActivity {
     private ImageView settingsButton;
 
     private SpeechRecognizer speechRecognizer;
+
     private Translator translator;
-    private TextToSpeech textToSpeech;
+    private TranslatorFactory translatorFactory;
+
+    private TextToSpeech textToSpeech1;
+    private TextToSpeech textToSpeech2;
 
     public static final int RECORD_AUDIO_REQUEST_CODE = 1;
     public static final int SELECT_LANGUAGE1_REQUEST_CODE = 2;
@@ -64,6 +62,21 @@ public class TranslationActivity extends AppCompatActivity {
 
     private boolean recordAudioAccessGranted;
 
+    public void setLanguage1(Language language1) {
+
+        this.language1 = language1;
+        languageOnChange(textViewLanguage1, language1);
+
+    }
+
+    public void setLanguage2(Language language2) {
+
+        this.language2 = language2;
+        languageOnChange(textViewLanguage2, language2);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -91,6 +104,11 @@ public class TranslationActivity extends AppCompatActivity {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(speechRecognitionListener());
 
+        translatorFactory = new TranslatorFactory();
+
+        setLanguage1(Language.defaultLanguage());
+        setLanguage2(Language.defaultLanguage());
+
     }
 
     @Override
@@ -103,21 +121,29 @@ public class TranslationActivity extends AppCompatActivity {
 
                 Bundle extras = data.getExtras();
 
-                language1 = (Language) extras.getSerializable(LanguagesListActivity.LANGUAGE_EXTRA_NAME);
-
-                textViewLanguage1.setText(language1.getName());
-                textViewLanguage1.setCompoundDrawablesWithIntrinsicBounds(language1.getFlagId(), 0, 0, 0);
+                setLanguage1((Language) extras.getSerializable(LanguagesListActivity.LANGUAGE_EXTRA_NAME));
 
             } else if (requestCode == SELECT_LANGUAGE2_REQUEST_CODE) {
 
                 Bundle extras = data.getExtras();
 
-                language2 = (Language) extras.getSerializable(LanguagesListActivity.LANGUAGE_EXTRA_NAME);
-
-                textViewLanguage2.setText(language2.getName());
-                textViewLanguage2.setCompoundDrawablesWithIntrinsicBounds(language2.getFlagId(), 0, 0, 0);
+                setLanguage2((Language) extras.getSerializable(LanguagesListActivity.LANGUAGE_EXTRA_NAME));
 
             }
+        }
+
+    }
+
+    private void languageOnChange(TextView textView, Language language) {
+
+        textView.setText(language.getName());
+        textView.setCompoundDrawablesWithIntrinsicBounds(language.getFlagId(), 0, 0, 0);
+
+        if (textView.getId() == R.id.language1_name){
+            textToSpeech2 = new TextToSpeech(this, i -> textToSpeech2.setLanguage(language1.getLocale()));
+        }
+        else if (textView.getId() == R.id.language2_name){
+            textToSpeech1 = new TextToSpeech(this, i -> textToSpeech1.setLanguage(language2.getLocale()));
         }
 
     }
@@ -170,10 +196,11 @@ public class TranslationActivity extends AppCompatActivity {
             else if (view.getId() == R.id.mic2){
                 mode = TRANSLATION_MODE_TO_NATIVE;}
 
-
             Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, new Locale(language1.getCode()));
+
+            speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, getUsingLanguage().getLocale());
+
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
             mic.setImageResource(R.drawable.microphone_on);
@@ -213,7 +240,12 @@ public class TranslationActivity extends AppCompatActivity {
 
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onError(int i) {
+                TextView currentTextSpeech = getCurrentTextSpeech();
+                currentTextSpeech.setText(null);
+            }
+
             @Override
             public void onResults(Bundle bundle) {
 
@@ -226,31 +258,30 @@ public class TranslationActivity extends AppCompatActivity {
 
                 if (mode == TRANSLATION_MODE_TO_FOREIGN){
 
-                    translator = new FirebaseTranslator(currentTextSpeech.getContext(), language1, language2);
+                    translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2);
 
-                    Task<String> task = translator.translate(recognizedText);
-
-                    task.addOnSuccessListener(s -> {textViewText2.setText(s);});
-
-                    task.addOnSuccessListener(s -> {
+                    translator.addOnResultListener(s -> {
                         textViewText2.setText(s);
-                        textToSpeech = new TextToSpeech(currentTextSpeech.getContext(), i -> textToSpeech.setLanguage(new Locale(language2.getCode())));
-                        textToSpeech.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
+                        textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
+
+                    translator.addOnErrorListener(e -> {textViewText2.setText(e.toString());});
+
+                    translator.translate(recognizedText);
 
                 }
                 else if (mode == TRANSLATION_MODE_TO_NATIVE){
 
                     translator = new FirebaseTranslator(currentTextSpeech.getContext(), language2, language1);
 
-                    Task<String> task = translator.translate(recognizedText);
-
-                    task.addOnSuccessListener(s -> {
+                    translator.addOnResultListener(s -> {
                         textViewText1.setText(s);
-                        textToSpeech = new TextToSpeech(currentTextSpeech.getContext(), i -> textToSpeech.setLanguage(new Locale(language1.getCode())));
-                        textToSpeech.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
+                        textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
+
+                    translator.addOnErrorListener(e -> {textViewText1.setText(e.toString());});
+
+                    translator.translate(recognizedText);
 
                 }
-
 
             }
 
@@ -268,6 +299,11 @@ public class TranslationActivity extends AppCompatActivity {
 
     private TextView getCurrentTextSpeech() {
         return mode == TRANSLATION_MODE_TO_FOREIGN ? textViewText1 : textViewText2;
+    }
+
+    private Language getUsingLanguage() {
+        Language language =  mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
+        return language;
     }
 
 

@@ -8,11 +8,15 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
 
-public class FirebaseTranslator implements Translator{
+public class FirebaseTranslator extends Translator{
 
     private com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator translator;
 
     public FirebaseTranslator(Context context, Language languageSrc, Language languageTarget) {
+
+        this.context = context;
+        this.languageSrc = languageSrc;
+        this.languageTarget = languageTarget;
 
         FirebaseApp.initializeApp(context);
 
@@ -27,9 +31,12 @@ public class FirebaseTranslator implements Translator{
     }
 
     @Override
-    public Task<String> translate(String text) {
+    public void translate(String text) {
 
-        return translator.translate(text);
+        Task<String> task = translator.translate(text);
+
+        task.addOnSuccessListener(s -> onResultListener.onResult(s));
+        task.addOnFailureListener(e -> onErrorListener.onError(e));
 
     }
 }

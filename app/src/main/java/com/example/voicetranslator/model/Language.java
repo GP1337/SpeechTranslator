@@ -1,32 +1,50 @@
 package com.example.voicetranslator.model;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.example.voicetranslator.R;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 public class Language implements Serializable {
 
-    private String code;
+    private Locale locale;
     private String name;
 
     private int id;
     private int flagId;
     private boolean modelDownloaded;
 
-    private Language(String code, int id, int flagId, String name) {
+    private static List<Language> languageList;
 
-        this.code = code;
+    static {
+
+        languageList = new ArrayList<>();
+
+        languageList.add(new Language(Locale.ENGLISH, FirebaseTranslateLanguage.EN, R.drawable.flag_en, "English"));
+        languageList.add(new Language(new Locale("ru", "RU"), FirebaseTranslateLanguage.RU, R.drawable.flag_ru, "Русский"));
+        languageList.add(new Language(Locale.FRENCH, FirebaseTranslateLanguage.FR, R.drawable.flag_fr, "Le français"));
+
+    }
+
+    private Language(Locale locale, int id, int flagId, String name) {
+
+        this.locale = locale;
         this.id = id;
         this.flagId = flagId;
         this.name = name;
 
     }
 
-    public String getCode() {
-        return code;
+    public Locale getLocale() {
+        return locale;
     }
 
     public int getFlagId() {
@@ -51,13 +69,18 @@ public class Language implements Serializable {
 
     public static List<Language> getAllLanguages(){
 
-        List<Language> languageList = new ArrayList<>();
+       return languageList;
 
-        languageList.add(new Language("ru", FirebaseTranslateLanguage.RU, R.drawable.flag_ru, "Русский"));
-        languageList.add(new Language("en", FirebaseTranslateLanguage.EN, R.drawable.flag_en, "English"));
-        languageList.add(new Language("fr", FirebaseTranslateLanguage.FR, R.drawable.flag_fr, "Le français"));
+    }
 
-        return languageList;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static Language defaultLanguage(){
+
+        List<Language> list = getAllLanguages();
+
+        Optional<Language> optionalLanguage = list.stream().filter(o -> o.getLocale() == Locale.getDefault()).findFirst();
+
+        return optionalLanguage.orElseGet(() -> list.get(0));
 
     }
 

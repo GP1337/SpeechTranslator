@@ -7,8 +7,9 @@
             app:defaultValue="reply"
             app:entries="@array/translation_modes_values_entries"
             app:entryValues="@array/translation_modes_values"
-            app:key="default_mode"
+            app:key="@string/default_mode_key"
             app:title="@string/default_offline_online_mode_title"
+            android:summary="%s"
             app:useSimpleSummaryProvider="true"
             android:defaultValue="@string/mode_online"/>
 

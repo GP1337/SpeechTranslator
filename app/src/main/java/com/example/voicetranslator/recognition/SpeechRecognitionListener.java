@@ -18,8 +18,8 @@ public abstract class SpeechRecognitionListener implements RecognitionListener {
     @Override
     public void onEndOfSpeech(){};
 
-    @Override
-    public void onError(int i){};
+//    @Override
+//    public void onError(int i){};
 
     @Override
     public void onEvent(int i, Bundle bundle){};

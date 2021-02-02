@@ -14,12 +14,20 @@ public abstract class Translator {
 
     public abstract void translate(String text);
 
-    public void addOnResultListener(OnResultListener onResultListener){
+    public Translator addOnResultListener(OnResultListener onResultListener){
+
         this.onResultListener = onResultListener;
+
+        return this;
+
     }
 
-    public void addOnErrorListener(OnErrorListener onErrorListener){
+    public Translator addOnErrorListener(OnErrorListener onErrorListener){
+
         this.onErrorListener = onErrorListener;
+
+        return this;
+
     }
 
     @FunctionalInterface

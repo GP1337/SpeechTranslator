@@ -234,7 +234,6 @@ public class TranslationActivity extends AppCompatActivity {
     }
 
     private SpeechRecognitionListener speechRecognitionListener(){
-
         return new SpeechRecognitionListener() {
 
             @Override
@@ -259,45 +258,7 @@ public class TranslationActivity extends AppCompatActivity {
             @Override
             public void onResults(Bundle bundle) {
 
-                TextView currentTextSpeech = getCurrentTextSpeech();
-                ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-                String recognizedText = data.get(0);
-
-                currentTextSpeech.setText(recognizedText);
-
-                if (mode == TRANSLATION_MODE_TO_FOREIGN){
-
-                    translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2);
-
-                    translator.addOnResultListener(s -> {
-                        textViewText2.setText(s);
-                        textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
-
-                    translator.addOnErrorListener(e -> {
-                        textViewText2.setText(e.toString());
-                        FirebaseCrashlytics.getInstance().recordException(e);
-                    });
-
-                    translator.translate(recognizedText);
-
-                }
-                else if (mode == TRANSLATION_MODE_TO_NATIVE){
-
-                    translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language2, language1);
-
-                    translator.addOnResultListener(s -> {
-                        textViewText1.setText(s);
-                        textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
-
-                    translator.addOnErrorListener(e -> {
-                        textViewText1.setText(e.toString());
-                        FirebaseCrashlytics.getInstance().recordException(e);
-                    });
-
-                    translator.translate(recognizedText);
-
-                }
+                recognitionOnResult(bundle);
 
             }
 
@@ -313,6 +274,44 @@ public class TranslationActivity extends AppCompatActivity {
         };
     }
 
+    private void recognitionOnResult(Bundle bundle) {
+
+        TextView currentTextSpeech = getCurrentTextSpeech();
+        ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+        String recognizedText = data.get(0);
+
+        currentTextSpeech.setText(recognizedText);
+
+        if (mode == TRANSLATION_MODE_TO_FOREIGN){
+
+            translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2)
+                    .addOnResultListener(s -> {
+                        textViewText2.setText(s);
+                        textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);})
+                    .addOnErrorListener(e -> {
+                        textViewText2.setText(e.toString());
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    });
+
+        }
+        else if (mode == TRANSLATION_MODE_TO_NATIVE){
+
+            translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2)
+                    .addOnResultListener(s -> {
+                        textViewText1.setText(s);
+                        textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);})
+                    .addOnErrorListener(e -> {
+                        textViewText1.setText(e.toString());
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    });
+
+        }
+
+        translator.translate(recognizedText);
+
+    }
+
     private TextView getCurrentTextSpeech() {
         return mode == TRANSLATION_MODE_TO_FOREIGN ? textViewText1 : textViewText2;
     }
@@ -320,6 +319,5 @@ public class TranslationActivity extends AppCompatActivity {
     private Language getUsingLanguage() {
         return mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
     }
-
 
 }

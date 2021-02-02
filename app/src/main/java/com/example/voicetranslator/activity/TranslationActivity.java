@@ -16,15 +16,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.voicetranslator.SpeechTranslatorApplication;
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.R;
 import com.example.voicetranslator.recognition.SpeechRecognitionListener;
-import com.example.voicetranslator.translation.FirebaseTranslator;
 import com.example.voicetranslator.translation.Translator;
 import com.example.voicetranslator.translation.TranslatorFactory;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport;
+import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
+import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
 
 import java.util.ArrayList;
 
@@ -146,6 +149,26 @@ public class TranslationActivity extends AppCompatActivity {
         }
         else if (textView.getId() == R.id.language2_name){
             textToSpeech1 = new TextToSpeech(this, i -> textToSpeech1.setLanguage(language2.getLocale()));
+        }
+
+        if(SpeechTranslatorApplication.getDefaultTranslationMode().equals(getString(R.string.mode_offline))){
+
+            FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+
+            Task<Boolean> booleanTask = FirebaseModelManager.getInstance().isModelDownloaded(remoteModel);
+
+            booleanTask.addOnSuccessListener(aBoolean -> {
+
+                if (!aBoolean) {
+                    Intent intent = LanguagesListActivity.getSettingsIntent(this);
+                    startActivity(intent);
+
+                    Toast.makeText(this, getString(R.string.offline_mode_warning), Toast.LENGTH_LONG)
+                            .show();
+                }
+
+            });
+
         }
 
     }

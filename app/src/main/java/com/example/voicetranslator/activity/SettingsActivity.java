@@ -2,6 +2,7 @@ package com.example.voicetranslator.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.SpeechRecognizer;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
@@ -12,6 +13,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.voicetranslator.R;
+import com.example.voicetranslator.SpeechTranslatorApplication;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -63,15 +65,21 @@ public class SettingsActivity extends AppCompatActivity {
 
         }
 
+
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {
 
-            if (preference.getKey().equals(getResources().getString(R.string.languages_key))){
-
+            if (preference.getKey().equals(getResources().getString(R.string.languages_key))) {
                 Intent intent = LanguagesListActivity.getSettingsIntent(getContext());
                 startActivity(intent);
-
             }
+
+            preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+                if (preference.getKey().equals(getString(R.string.default_mode_key))) {
+                    SpeechTranslatorApplication.setDefaultTranslationMode((String) newValue);
+                }
+                return true;
+            });
 
             return super.onPreferenceTreeClick(preference);
 

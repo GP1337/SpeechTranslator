@@ -1,9 +1,5 @@
 package com.example.voicetranslator.model;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import com.example.voicetranslator.R;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
 
@@ -31,6 +27,9 @@ public class Language implements Serializable {
         languageList.add(new Language(Locale.ENGLISH, FirebaseTranslateLanguage.EN, R.drawable.flag_en, "English"));
         languageList.add(new Language(new Locale("ru", "RU"), FirebaseTranslateLanguage.RU, R.drawable.flag_ru, "Русский"));
         languageList.add(new Language(Locale.FRENCH, FirebaseTranslateLanguage.FR, R.drawable.flag_fr, "Le français"));
+        languageList.add(new Language(Locale.GERMAN, FirebaseTranslateLanguage.DE, R.drawable.flag_fr, "Deutsch"));
+        languageList.add(new Language(Locale.ITALIAN, FirebaseTranslateLanguage.IT, R.drawable.flag_fr, "italiano"));
+        languageList.add(new Language(Locale.JAPANESE, FirebaseTranslateLanguage.JA, R.drawable.flag_fr, "日本語"));
 
     }
 

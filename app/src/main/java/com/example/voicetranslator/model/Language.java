@@ -77,7 +77,7 @@ public class Language implements Serializable {
 
         List<Language> list = getAllLanguages();
 
-        Optional<Language> optionalLanguage = list.stream().filter(o -> o.getLocale() == Locale.getDefault()).findFirst();
+        Optional<Language> optionalLanguage = list.stream().filter(o -> o.getLocale().equals(Locale.getDefault())).findFirst();
 
         return optionalLanguage.orElseGet(() -> list.get(0));
 

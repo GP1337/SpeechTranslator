@@ -7,6 +7,7 @@
 
     <ImageView
         android:id="@+id/item_list_flag"
+        android:src="@drawable/flag_en"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
@@ -16,21 +17,27 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_list_name"
         android:layout_weight="1"
-        android:text="asasdasda"
+        android:text="English"
+        android:layout_centerVertical="true"
+        android:paddingLeft="10dp"
         android:layout_toRightOf="@id/item_list_flag"/>
 
     <ImageView
         android:id="@+id/item_list_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/download"
-        android:layout_alignParentRight="true"/>
+        android:src="@drawable/ic_baseline_cloud_download_64"
+        android:layout_alignParentRight="true"
+        android:paddingRight="10dp"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:indeterminateTint="@android:color/black"
         android:layout_alignParentRight="true"/>
 
 </RelativeLayout >

@@ -9,7 +9,6 @@ import androidx.preference.PreferenceManager;
 import com.example.voicetranslator.R;
 import com.example.voicetranslator.model.Language;
 
-
 public class TranslatorFactory {
 
     public Translator getTranslator(Context context, Language languageSrc, Language languageTarget){

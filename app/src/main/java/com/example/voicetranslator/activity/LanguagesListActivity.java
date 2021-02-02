@@ -9,13 +9,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.adapter.LanguageListAdapter;
 import com.example.voicetranslator.R;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class LanguagesListActivity extends AppCompatActivity {
 
@@ -116,11 +120,21 @@ public class LanguagesListActivity extends AppCompatActivity {
                             })
                             .addOnFailureListener(e -> {
 
-                                //todo logs
+                                FirebaseCrashlytics.getInstance().recordException(e);
 
                             });
                 }
 
+            }
+
+            public void onChildDraw (@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive){
+
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addActionIcon(R.drawable.ic_baseline_delete_sweep_64)
+                        .create()
+                        .decorate();
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
         };
     }

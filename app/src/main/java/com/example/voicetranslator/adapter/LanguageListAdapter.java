@@ -61,61 +61,34 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
     @Override
     public void onBindViewHolder(@NonNull LanguageViewHolder holder, int position) {
 
-        LanguageViewHolder languageViewHolder = (LanguageViewHolder) holder;
-
         Language language = languagesList.get(position);
 
-        languageViewHolder.flag.setImageResource(language.getFlagId());
+        holder.flag.setImageResource(language.getFlagId());
 
-        languageViewHolder.progressBar.setVisibility(View.INVISIBLE);
+        holder.progressBar.setVisibility(View.INVISIBLE);
 
         if (mode == LanguagesListActivity.MODE_SELECT){
 
-            languageViewHolder.download.setVisibility(View.INVISIBLE);
-            languageViewHolder.progressBar.setVisibility(View.INVISIBLE);
+            holder.download.setVisibility(View.INVISIBLE);
+            holder.progressBar.setVisibility(View.INVISIBLE);
 
-            languageViewHolder.root.setOnClickListener(view -> rootOnClickListener(view, position));
+            holder.root.setOnClickListener(view -> rootOnClickListener(view, position));
 
         }
         else if (mode == LanguagesListActivity.MODE_SETTINGS){
 
             if (language.isModelDownloaded()) {
 
-                languageViewHolder.download.setImageResource(0);
-                languageViewHolder.download.setOnClickListener(null);
+                holder.download.setImageResource(0);
+                holder.download.setOnClickListener(null);
 
             } else {
 
-                languageViewHolder.download.setImageResource(R.drawable.download);
-                languageViewHolder.download.setOnClickListener(view -> {
-
-                    languageViewHolder.setVisibility(true);
-
-                    FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
-
-                    FirebaseTranslateRemoteModel remoteModel =
-                            new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
-
-                    FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
-                            .requireWifi()
-                            .build();
-
-                    modelManager.download(remoteModel, conditions)
-                            .addOnSuccessListener(v -> {
-
-                                language.setModelDownloaded(true);
-
-                                notifyDataSetChanged();
-
-                                languageViewHolder.setVisibility(false);
-                                languageViewHolder.download.setOnClickListener(null);
-                            })
-                            .addOnFailureListener(e -> languageViewHolder.setVisibility(false));
-
-                });
+                holder.download.setImageResource(R.drawable.ic_baseline_cloud_download_64);
+                holder.download.setOnClickListener(view -> downloadOnClickListener(view, holder, language));
             }
         }
-        languageViewHolder.name.setText(language.getName());
+        holder.name.setText(language.getName());
 
     }
 
@@ -166,6 +139,31 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
         context.setResult(Activity.RESULT_OK, intent);
         context.finish();
 
+    }
+
+    private void downloadOnClickListener(View view, LanguageViewHolder languageViewHolder, Language language){
+
+        languageViewHolder.setVisibility(true);
+
+        FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+
+        FirebaseTranslateRemoteModel remoteModel =
+                new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+
+        FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+                .build();
+
+        modelManager.download(remoteModel, conditions)
+                .addOnSuccessListener(v -> {
+
+                    language.setModelDownloaded(true);
+
+                    notifyDataSetChanged();
+
+                    languageViewHolder.setVisibility(false);
+                    languageViewHolder.download.setOnClickListener(null);
+                })
+                .addOnFailureListener(e -> languageViewHolder.setVisibility(false));
     }
 
 }

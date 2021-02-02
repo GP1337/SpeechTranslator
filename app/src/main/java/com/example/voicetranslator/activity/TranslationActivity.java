@@ -23,6 +23,9 @@ import com.example.voicetranslator.recognition.SpeechRecognitionListener;
 import com.example.voicetranslator.translation.FirebaseTranslator;
 import com.example.voicetranslator.translation.Translator;
 import com.example.voicetranslator.translation.TranslatorFactory;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.crashlytics.internal.model.CrashlyticsReport;
+
 import java.util.ArrayList;
 
 public class TranslationActivity extends AppCompatActivity {
@@ -185,7 +188,7 @@ public class TranslationActivity extends AppCompatActivity {
         ImageView mic = (ImageView) view;
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            mic.setImageResource(R.drawable.microphone_off);
+            mic.setImageResource(R.drawable.ic_baseline_mic_none_64);
             speechRecognizer.stopListening();
         }
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -195,6 +198,8 @@ public class TranslationActivity extends AppCompatActivity {
             else if (view.getId() == R.id.mic2){
                 mode = TRANSLATION_MODE_TO_NATIVE;}
 
+            getCurrentTextSpeech().setHint(R.string.hint_speak);
+
             Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
@@ -202,7 +207,7 @@ public class TranslationActivity extends AppCompatActivity {
 
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
-            mic.setImageResource(R.drawable.microphone_on);
+            mic.setImageResource(R.drawable.ic_baseline_mic_64);
 
             speechRecognizer.startListening(speechRecognizerIntent);
 
@@ -236,14 +241,19 @@ public class TranslationActivity extends AppCompatActivity {
             public void onBeginningOfSpeech() {
 
                 TextView currentTextSpeech = getCurrentTextSpeech();
-                currentTextSpeech.setText(R.string.listening);
+                currentTextSpeech.setHint(R.string.hint_listening);
 
             }
 
             @Override
             public void onError(int i) {
+
                 TextView currentTextSpeech = getCurrentTextSpeech();
                 currentTextSpeech.setText(null);
+                currentTextSpeech.setHint(R.string.hint_start);
+
+                FirebaseCrashlytics.getInstance().recordException(new Exception("Recognition on error, code: ".concat(String.valueOf(i))));
+
             }
 
             @Override
@@ -264,20 +274,26 @@ public class TranslationActivity extends AppCompatActivity {
                         textViewText2.setText(s);
                         textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
 
-                    translator.addOnErrorListener(e -> {textViewText2.setText(e.toString());});
+                    translator.addOnErrorListener(e -> {
+                        textViewText2.setText(e.toString());
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    });
 
                     translator.translate(recognizedText);
 
                 }
                 else if (mode == TRANSLATION_MODE_TO_NATIVE){
 
-                    translator = new FirebaseTranslator(currentTextSpeech.getContext(), language2, language1);
+                    translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language2, language1);
 
                     translator.addOnResultListener(s -> {
                         textViewText1.setText(s);
                         textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);});
 
-                    translator.addOnErrorListener(e -> {textViewText1.setText(e.toString());});
+                    translator.addOnErrorListener(e -> {
+                        textViewText1.setText(e.toString());
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    });
 
                     translator.translate(recognizedText);
 
@@ -302,8 +318,7 @@ public class TranslationActivity extends AppCompatActivity {
     }
 
     private Language getUsingLanguage() {
-        Language language =  mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
-        return language;
+        return mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
     }
 
 

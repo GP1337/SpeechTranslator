@@ -7,6 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.voicetranslator.model.Language;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,7 +33,8 @@ public class GoogleTranslator extends Translator{
                     "&target=" + languageTarget.getLocale().getLanguage() +
                     "&source=" + languageSrc.getLocale().getLanguage();
         } catch (UnsupportedEncodingException e) {
-            // TODO: 01.02.2021 logs
+            onErrorListener.onError(e);
+            return;
         }
 
         // Request a string response from the provided URL.

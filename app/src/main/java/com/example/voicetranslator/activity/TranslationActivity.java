@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -28,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -70,6 +73,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         this.language1 = language1;
         languageOnChange(textViewLanguage1, language1);
+        saveProperty(language1, getString(R.string.language1_key));
 
     }
 
@@ -77,6 +81,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         this.language2 = language2;
         languageOnChange(textViewLanguage2, language2);
+        saveProperty(language2, getString(R.string.language2_key));
 
     }
 
@@ -109,8 +114,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         translatorFactory = new TranslatorFactory();
 
-        setLanguage1(Language.defaultLanguage());
-        setLanguage2(Language.getAllLanguages().get(0));
+        readSavedLanguages();
 
         recordAudioAccessGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
 
@@ -343,4 +347,44 @@ public class TranslationActivity extends AppCompatActivity {
         return mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
     }
 
+    private void saveProperty(Object value, String key){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(key, new Gson().toJson(value));
+        editor.commit();
+
+    }
+
+    private void readSavedLanguages(){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        Gson gson = new Gson();
+
+        String language1Json = sharedPreferences.getString(getString(R.string.language1_key), "");
+
+        Language language1 = gson.fromJson(language1Json, Language.class);
+
+        if (language1 != null){
+            setLanguage1(language1);
+        } else
+        {
+            setLanguage1(Language.defaultLanguage());
+        }
+
+        String language2Json = sharedPreferences.getString(getString(R.string.language2_key), "");
+
+        Language language2 = gson.fromJson(language2Json, Language.class);
+
+        if (language2 != null){
+            setLanguage2(language2);
+        } else
+        {
+            setLanguage2(Language.getAllLanguages().get(0));
+        }
+
+    }
 }

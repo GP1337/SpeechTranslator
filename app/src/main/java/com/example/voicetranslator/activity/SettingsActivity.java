@@ -2,7 +2,6 @@ package com.example.voicetranslator.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.SpeechRecognizer;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;

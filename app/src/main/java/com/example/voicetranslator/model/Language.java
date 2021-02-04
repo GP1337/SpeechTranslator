@@ -1,7 +1,12 @@
 package com.example.voicetranslator.model;
 
+import androidx.preference.ListPreference;
+
 import com.example.voicetranslator.R;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
+import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ public class Language implements Serializable {
     private boolean modelDownloaded;
 
     private static List<Language> languageList;
+    private static FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
 
     static {
 
@@ -39,6 +45,12 @@ public class Language implements Serializable {
         this.id = id;
         this.flagId = flagId;
         this.name = name;
+
+        FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(id).build();
+
+        Task<Boolean> booleanTask = modelManager.isModelDownloaded(remoteModel);
+
+        booleanTask.addOnSuccessListener(aBoolean -> this.modelDownloaded = aBoolean);
 
     }
 
@@ -79,6 +91,14 @@ public class Language implements Serializable {
         Optional<Language> optionalLanguage = list.stream().filter(o -> o.getLocale().equals(Locale.getDefault())).findFirst();
 
         return optionalLanguage.orElseGet(() -> list.get(0));
+
+    }
+
+    public static Language getById(int id){
+
+        Optional<Language> optionalLanguage = languageList.stream().filter(language -> {return language.getId() == id;}).findFirst();
+
+        return optionalLanguage.orElseGet(() -> null);
 
     }
 

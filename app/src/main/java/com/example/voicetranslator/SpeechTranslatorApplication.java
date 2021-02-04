@@ -17,7 +17,7 @@ public class SpeechTranslatorApplication extends Application {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        SpeechTranslatorApplication.defaultTranslationMode = preferences.getString(context.getString(R.string.default_mode_key), context.getString(R.string.mode_online));
+        SpeechTranslatorApplication.defaultTranslationMode = preferences.getString(context.getString(R.string.default_mode_key), context.getString(R.string.mode_offline));
 
     }
 

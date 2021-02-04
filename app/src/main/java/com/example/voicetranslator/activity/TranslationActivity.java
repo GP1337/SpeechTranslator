@@ -27,6 +27,7 @@ import com.example.voicetranslator.recognition.SpeechRecognitionListener;
 import com.example.voicetranslator.translation.Translator;
 import com.example.voicetranslator.translation.TranslatorFactory;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
@@ -73,7 +74,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         this.language1 = language1;
         languageOnChange(textViewLanguage1, language1);
-        saveProperty(language1, getString(R.string.language1_key));
+        saveProperty(language1.getId(), getString(R.string.language1_key));
 
     }
 
@@ -81,7 +82,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         this.language2 = language2;
         languageOnChange(textViewLanguage2, language2);
-        saveProperty(language2, getString(R.string.language2_key));
+        saveProperty(language2.getId(), getString(R.string.language2_key));
 
     }
 
@@ -212,6 +213,15 @@ public class TranslationActivity extends AppCompatActivity {
             return false;
         }
 
+        if (SpeechTranslatorApplication.getDefaultTranslationMode().equals(getString(R.string.mode_offline)) && (!language1.isModelDownloaded() || !language2.isModelDownloaded())){
+
+            Snackbar.make(view, R.string.offline_mode_warning, Snackbar.LENGTH_LONG).setAction(R.string.snackbar_warning_offline_action, view1 -> {
+                startActivity(LanguagesListActivity.getSettingsIntent(this));
+                }).show();
+
+            return false;
+        }
+
         ImageView mic = (ImageView) view;
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
@@ -324,7 +334,7 @@ public class TranslationActivity extends AppCompatActivity {
         }
         else if (mode == TRANSLATION_MODE_TO_NATIVE){
 
-            translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2)
+            translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language2, language1)
                     .addOnResultListener(s -> {
                         textViewText1.setText(s);
                         textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);})
@@ -347,13 +357,12 @@ public class TranslationActivity extends AppCompatActivity {
         return mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
     }
 
-    private void saveProperty(Object value, String key){
+    private void saveProperty(int value, String key){
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString(key, new Gson().toJson(value));
+        editor.putInt(key, value);
         editor.commit();
 
     }
@@ -362,29 +371,26 @@ public class TranslationActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Gson gson = new Gson();
+        int language1Id = sharedPreferences.getInt(getString(R.string.language1_key), 0);
 
-        String language1Json = sharedPreferences.getString(getString(R.string.language1_key), "");
+        Language language1 = Language.getById(language1Id);
 
-        Language language1 = gson.fromJson(language1Json, Language.class);
-
-        if (language1 != null){
+        if (language1 != null) {
             setLanguage1(language1);
-        } else
-        {
+        } else {
             setLanguage1(Language.defaultLanguage());
         }
 
-        String language2Json = sharedPreferences.getString(getString(R.string.language2_key), "");
+        int language2Id = sharedPreferences.getInt(getString(R.string.language2_key), 0);
 
-        Language language2 = gson.fromJson(language2Json, Language.class);
+        Language language2 = Language.getById(language2Id);
 
-        if (language2 != null){
+        if (language2 != null) {
             setLanguage2(language2);
-        } else
-        {
+        } else {
             setLanguage2(Language.getAllLanguages().get(0));
         }
 
     }
+
 }

@@ -20,6 +20,7 @@
     <string name="languages_key">languages</string>
     <string name="language1_key">language1</string>
     <string name="language2_key">language2</string>
+    <string name="snackbar_warning_offline_action">Go</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"

@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.R;
 import com.example.voicetranslator.activity.LanguagesListActivity;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
@@ -36,18 +35,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
     public LanguageListAdapter(int mode) {
 
         this.mode = mode;
-
-        for (Language language : languagesList) {
-
-            FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
-
-            Task<Boolean> booleanTask = modelManager.isModelDownloaded(remoteModel);
-
-            booleanTask.addOnSuccessListener(aBoolean -> {
-                language.setModelDownloaded(aBoolean);
-                notifyDataSetChanged();
-            });
-        }
 
     }
 

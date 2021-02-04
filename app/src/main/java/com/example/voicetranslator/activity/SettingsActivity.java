@@ -46,11 +46,11 @@ public class SettingsActivity extends AppCompatActivity {
 
             ListPreference listPreference = findPreference(getString(R.string.default_mode_key));
             if (listPreference.getEntry() == null){
-                listPreference.setValue(getString(R.string.mode_online));
+                listPreference.setValue(getString(R.string.mode_offline));
             }
 
             listPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-                if (newValue == getString(R.string.mode_offline)){
+                if (newValue.equals(getString(R.string.mode_offline))){
 
                     Intent intent = LanguagesListActivity.getSettingsIntent(getContext());
                     startActivity(intent);

@@ -64,6 +64,8 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
         }
         else if (mode == LanguagesListActivity.MODE_SETTINGS){
 
+            holder.setVisibility(language);
+
             if (language.isModelDownloaded()) {
 
                 holder.download.setImageResource(0);
@@ -82,6 +84,47 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
     @Override
     public int getItemCount() {
         return languagesList.size();
+    }
+
+    private void rootOnClickListener(View view, int position){
+
+        LanguagesListActivity context =  (LanguagesListActivity) view.getContext();
+        Intent intent = new Intent();
+        intent.putExtra(LanguagesListActivity.LANGUAGE_EXTRA_NAME, languagesList.get(position));
+
+        context.setResult(Activity.RESULT_OK, intent);
+        context.finish();
+
+    }
+
+    private void downloadOnClickListener(View view, LanguageViewHolder languageViewHolder, Language language){
+
+        FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+
+        FirebaseTranslateRemoteModel remoteModel =
+                new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+
+        FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+                .build();
+
+        modelManager.download(remoteModel, conditions)
+                .addOnSuccessListener(v -> {
+
+                    language.setModelDownloaded(true);
+                    language.setModelDownloading(false);
+
+                    notifyDataSetChanged();
+
+                    languageViewHolder.setVisibility(language);
+                    languageViewHolder.download.setOnClickListener(null);
+
+                })
+                .addOnFailureListener(e -> {
+                    language.setModelDownloading(false);
+                    languageViewHolder.setVisibility(language);});
+
+        language.setModelDownloading(true);
+        languageViewHolder.setVisibility(language);
     }
 
     public class LanguageViewHolder extends RecyclerView.ViewHolder{
@@ -104,9 +147,9 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 
         }
 
-        public void setVisibility(boolean downloading){
+        public void setVisibility(Language language){
 
-            if (downloading) {
+            if (language.isModelDownloading()) {
                 progressBar.setVisibility(View.VISIBLE);
                 download.setVisibility(View.GONE);
             } else {
@@ -115,42 +158,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
             }
         }
 
-    }
-
-    private void rootOnClickListener(View view, int position){
-
-        LanguagesListActivity context =  (LanguagesListActivity) view.getContext();
-        Intent intent = new Intent();
-        intent.putExtra(LanguagesListActivity.LANGUAGE_EXTRA_NAME, languagesList.get(position));
-
-        context.setResult(Activity.RESULT_OK, intent);
-        context.finish();
-
-    }
-
-    private void downloadOnClickListener(View view, LanguageViewHolder languageViewHolder, Language language){
-
-        languageViewHolder.setVisibility(true);
-
-        FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
-
-        FirebaseTranslateRemoteModel remoteModel =
-                new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
-
-        FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
-                .build();
-
-        modelManager.download(remoteModel, conditions)
-                .addOnSuccessListener(v -> {
-
-                    language.setModelDownloaded(true);
-
-                    notifyDataSetChanged();
-
-                    languageViewHolder.setVisibility(false);
-                    languageViewHolder.download.setOnClickListener(null);
-                })
-                .addOnFailureListener(e -> languageViewHolder.setVisibility(false));
     }
 
 }

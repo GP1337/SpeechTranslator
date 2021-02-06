@@ -7,10 +7,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.voicetranslator.model.Language;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 public class GoogleTranslator extends Translator{
 
@@ -25,10 +25,17 @@ public class GoogleTranslator extends Translator{
     @Override
     public void translate(String text) {
 
-        RequestQueue queue = Volley.newRequestQueue(context);
+        List<String> urlList = TranslatorUrlPool.getInstance(context).getPool();
         String url = null;
+
+        if (urlList.size() > 0){
+            url = urlList.get(0);
+        }
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+
         try {
-            url = "https://script.google.com/macros/s/AKfycbyswQaSSoMgMCWCDRMesSlF79obXjioqldfvOhKgc9TlL79vSa2chrN/exec" +
+            url = url +
                     "?q=" + URLEncoder.encode(text, "UTF-8") +
                     "&target=" + languageTarget.getLocale().getLanguage() +
                     "&source=" + languageSrc.getLocale().getLanguage();

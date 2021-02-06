@@ -22,6 +22,7 @@ public class Language implements Serializable {
     private int id;
     private int flagId;
     private boolean modelDownloaded;
+    private boolean modelDownloading;
 
     private static List<Language> languageList;
     private static FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
@@ -74,6 +75,14 @@ public class Language implements Serializable {
         return modelDownloaded;
     }
 
+    public boolean isModelDownloading() {
+        return modelDownloading;
+    }
+
+    public void setModelDownloading(boolean modelDownloading) {
+        this.modelDownloading = modelDownloading;
+    }
+
     public void setModelDownloaded(boolean modelDownloaded) {
         this.modelDownloaded = modelDownloaded;
     }
@@ -92,6 +101,14 @@ public class Language implements Serializable {
 
         return optionalLanguage.orElseGet(() -> list.get(0));
 
+    }
+
+    public static Language getEnglish(){
+        return languageList.get(0);
+    }
+
+    public boolean isDeletable(){
+        return this != getEnglish();
     }
 
     public static Language getById(int id){

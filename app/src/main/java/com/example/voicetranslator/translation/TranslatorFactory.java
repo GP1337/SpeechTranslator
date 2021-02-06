@@ -17,7 +17,7 @@ public class TranslatorFactory {
 
         String mode = preferences.getString(context.getString(R.string.default_mode_key), context.getString(R.string.mode_online));
 
-        if (mode.equals(context.getString(R.string.mode_online)) && isNetworkConnected(context)){
+        if (mode.equals(context.getString(R.string.mode_online)) && isNetworkConnected(context) && TranslatorUrlPool.getInstance().getPool().size() > 0){
             return new GoogleTranslator(context, languageSrc, languageTarget);
         }
         else {

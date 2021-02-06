@@ -1,6 +1,7 @@
 package com.example.voicetranslator.activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.adapter.LanguageListAdapter;
@@ -76,6 +78,23 @@ public class LanguagesListActivity extends AppCompatActivity {
 
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
 
+        ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private ItemTouchHelper.Callback getCallback(LanguageListAdapter adapter) {
@@ -88,7 +107,7 @@ public class LanguagesListActivity extends AppCompatActivity {
                 int dragFlags = 0;
                 int swipeFlags = 0;
 
-                if (language.isModelDownloaded()){
+                if (language.isModelDownloaded() && language.isDeletable()){
                    swipeFlags = ItemTouchHelper.START;
                 }
 

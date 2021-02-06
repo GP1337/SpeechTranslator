@@ -1,8 +1,8 @@
 <resources>
     <!-- Reply Preference -->
     <string-array name="translation_modes_values_entries">
-        <item>Online</item>
-        <item>Offline</item>
+        <item>Online (more accurate)</item>
+        <item>Offline (faster)</item>
     </string-array>
 
     <string-array name="translation_modes_values">

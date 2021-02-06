@@ -26,14 +26,15 @@ import com.example.voicetranslator.R;
 import com.example.voicetranslator.recognition.SpeechRecognitionListener;
 import com.example.voicetranslator.translation.Translator;
 import com.example.voicetranslator.translation.TranslatorFactory;
+import com.example.voicetranslator.translation.TranslatorUrlPool;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TranslationActivity extends AppCompatActivity {
 
@@ -91,6 +92,12 @@ public class TranslationActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translation);
+
+        TranslatorUrlPool.init(urlList -> {
+            if (urlList.size() == 0){
+                Toast.makeText(this, R.string.online_disabled_toast, Toast.LENGTH_LONG).show();
+            }
+        });
 
         textViewText1 = findViewById(R.id.speech_text1);
         textViewText2 = findViewById(R.id.speech_text2);
@@ -165,11 +172,9 @@ public class TranslationActivity extends AppCompatActivity {
             booleanTask.addOnSuccessListener(aBoolean -> {
 
                 if (!aBoolean) {
-                    Intent intent = LanguagesListActivity.getSettingsIntent(this);
-                    startActivity(intent);
+                    Snackbar.make(textView, R.string.offline_mode_warning, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_warning_offline_action, view1 -> startActivity(LanguagesListActivity.getSettingsIntent(this))).show();
 
-                    Toast.makeText(this, getString(R.string.offline_mode_warning), Toast.LENGTH_LONG)
-                            .show();
                 }
 
             });
@@ -215,9 +220,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         if (SpeechTranslatorApplication.getDefaultTranslationMode().equals(getString(R.string.mode_offline)) && (!language1.isModelDownloaded() || !language2.isModelDownloaded())){
 
-            Snackbar.make(view, R.string.offline_mode_warning, Snackbar.LENGTH_LONG).setAction(R.string.snackbar_warning_offline_action, view1 -> {
-                startActivity(LanguagesListActivity.getSettingsIntent(this));
-                }).show();
+            Snackbar.make(view, R.string.offline_mode_warning, Snackbar.LENGTH_LONG).setAction(R.string.snackbar_warning_offline_action, view1 -> startActivity(LanguagesListActivity.getSettingsIntent(this))).show();
 
             return false;
         }
@@ -388,7 +391,7 @@ public class TranslationActivity extends AppCompatActivity {
         if (language2 != null) {
             setLanguage2(language2);
         } else {
-            setLanguage2(Language.getAllLanguages().get(0));
+            setLanguage2(Language.getEnglish());
         }
 
     }

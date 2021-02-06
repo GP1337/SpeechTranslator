@@ -2,8 +2,10 @@ package com.example.voicetranslator.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.ListPreference;
@@ -36,6 +38,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    
     public static class SettingsFragment extends PreferenceFragmentCompat {
 
         @Override
@@ -63,7 +76,6 @@ public class SettingsActivity extends AppCompatActivity {
             });
 
         }
-
 
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {

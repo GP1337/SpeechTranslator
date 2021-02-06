@@ -1,0 +1,8 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="translation_modes_values_entries">
+        <item>Использовать подключение к интернету (большая точность)</item>
+        <item>Не использовать подключение к интернету (быстрее)</item>
+    </string-array>
+
+</resources>

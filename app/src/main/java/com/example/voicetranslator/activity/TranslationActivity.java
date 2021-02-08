@@ -14,13 +14,11 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.voicetranslator.SpeechTranslatorApplication;
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.R;
 import com.example.voicetranslator.recognition.SpeechRecognitionListener;
@@ -30,11 +28,10 @@ import com.example.voicetranslator.translation.TranslatorUrlPool;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+import com.google.mlkit.common.model.RemoteModelManager;
+import com.google.mlkit.nl.translate.TranslateRemoteModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TranslationActivity extends AppCompatActivity {
 
@@ -52,6 +49,9 @@ public class TranslationActivity extends AppCompatActivity {
     private ImageView imageViewMic1;
     private ImageView imageViewMic2;
 
+    private ImageView imageViewReplay1;
+    private ImageView imageViewReplay2;
+
     private ImageView settingsButton;
 
     private SpeechRecognizer speechRecognizer;
@@ -61,6 +61,8 @@ public class TranslationActivity extends AppCompatActivity {
 
     private TextToSpeech textToSpeech1;
     private TextToSpeech textToSpeech2;
+
+    private boolean listening;
 
     public static final int RECORD_AUDIO_REQUEST_CODE = 1;
     public static final int SELECT_LANGUAGE1_REQUEST_CODE = 2;
@@ -109,11 +111,17 @@ public class TranslationActivity extends AppCompatActivity {
         imageViewMic1 = findViewById(R.id.mic1);
         imageViewMic2 = findViewById(R.id.mic2);
 
+        imageViewReplay1 = findViewById(R.id.replay1);
+        imageViewReplay2 = findViewById(R.id.replay2);
+
         textViewLanguage1.setOnClickListener(this::languageOnClickListener);
         textViewLanguage2.setOnClickListener(this::languageOnClickListener);
 
-        imageViewMic1.setOnTouchListener(this::micOnTouchListener);
-        imageViewMic2.setOnTouchListener(this::micOnTouchListener);
+        imageViewMic1.setOnClickListener(this::micOnTouchListener);
+        imageViewMic2.setOnClickListener(this::micOnTouchListener);
+
+        imageViewReplay1.setOnClickListener(this::replayOnclickListener);
+        imageViewReplay2.setOnClickListener(this::replayOnclickListener);
 
         settingsButton.setOnClickListener(this::settingsOnClickListener);
 
@@ -163,17 +171,18 @@ public class TranslationActivity extends AppCompatActivity {
             textToSpeech1 = new TextToSpeech(this, i -> textToSpeech1.setLanguage(language2.getLocale()));
         }
 
-        if(SpeechTranslatorApplication.getDefaultTranslationMode().equals(getString(R.string.mode_offline))){
 
-            FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+        if(language1 != null && language2 != null && !translatorFactory.getTranslator(this, language1, language2).useInternet()){
 
-            Task<Boolean> booleanTask = FirebaseModelManager.getInstance().isModelDownloaded(remoteModel);
+            TranslateRemoteModel remoteModel = new TranslateRemoteModel.Builder(language.getId()).build();
+
+            Task<Boolean> booleanTask = RemoteModelManager.getInstance().isModelDownloaded(remoteModel);
 
             booleanTask.addOnSuccessListener(aBoolean -> {
 
                 if (!aBoolean) {
-                    Snackbar.make(textView, R.string.offline_mode_warning, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.snackbar_warning_offline_action, view1 -> startActivity(LanguagesListActivity.getSettingsIntent(this))).show();
+
+                    showSnackbarWarning(textView);
 
                 }
 
@@ -211,27 +220,29 @@ public class TranslationActivity extends AppCompatActivity {
 
     }
 
-    private boolean micOnTouchListener(View view, MotionEvent motionEvent){
+    private void micOnTouchListener(View view){
 
         if (!recordAudioAccessGranted){
             checkPermission();
-            return false;
+            return;
         }
 
-        if (SpeechTranslatorApplication.getDefaultTranslationMode().equals(getString(R.string.mode_offline)) && (!language1.isModelDownloaded() || !language2.isModelDownloaded())){
+        if (!translatorFactory.getTranslator(this, language1, language2).useInternet()
+                && (!language1.isModelDownloaded() || !language2.isModelDownloaded())){
 
-            Snackbar.make(view, R.string.offline_mode_warning, Snackbar.LENGTH_LONG).setAction(R.string.snackbar_warning_offline_action, view1 -> startActivity(LanguagesListActivity.getSettingsIntent(this))).show();
-
-            return false;
+            showSnackbarWarning(view);
+            return;
         }
 
         ImageView mic = (ImageView) view;
 
-        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+        if (listening) {
             mic.setImageResource(R.drawable.ic_baseline_mic_none_64);
             speechRecognizer.stopListening();
         }
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        else  {
+
+            mic.setImageResource(R.drawable.ic_baseline_mic_64);
 
             if (view.getId() == R.id.mic1){
                 mode = TRANSLATION_MODE_TO_FOREIGN;}
@@ -247,15 +258,38 @@ public class TranslationActivity extends AppCompatActivity {
 
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
-            mic.setImageResource(R.drawable.ic_baseline_mic_64);
-
             speechRecognizer.startListening(speechRecognizerIntent);
-
-            return true;
 
         }
 
-        return false;
+        listening = !listening;
+
+    }
+
+    private void showSnackbarWarning(View view) {
+        Snackbar snackbar = Snackbar.make(view, R.string.offline_mode_warning, Snackbar.LENGTH_LONG)
+                .setAction(R.string.snackbar_warning_offline_action, view1 -> startActivity(LanguagesListActivity.getSettingsIntent(this)));
+
+        View snackbarView = snackbar.getView();
+        TextView snackTextView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+
+        snackTextView.setMaxLines(3);
+
+        snackbar.show();
+    }
+
+    private void replayOnclickListener(View view){
+
+        if (view.getId() == R.id.replay1){
+
+            textToSpeech2.speak(textViewText1.getText(), TextToSpeech.QUEUE_FLUSH, null, null);
+
+        }
+        else if (view.getId() == R.id.replay2){
+
+            textToSpeech1.speak(textViewText2.getText(), TextToSpeech.QUEUE_FLUSH, new Bundle(), null);
+
+        }
 
     }
 
@@ -286,6 +320,8 @@ public class TranslationActivity extends AppCompatActivity {
 
             @Override
             public void onError(int i) {
+
+                getCurrentMicView().setImageResource(R.drawable.ic_baseline_mic_none_64);
 
                 TextView currentTextSpeech = getCurrentTextSpeech();
                 currentTextSpeech.setText(null);
@@ -325,10 +361,12 @@ public class TranslationActivity extends AppCompatActivity {
 
         if (mode == TRANSLATION_MODE_TO_FOREIGN){
 
+            imageViewMic1.setImageResource(R.drawable.ic_baseline_mic_none_64);
+
             translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language1, language2)
                     .addOnResultListener(s -> {
                         textViewText2.setText(s);
-                        textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);})
+                        textToSpeech1.speak(s, TextToSpeech.QUEUE_ADD, null, null);})
                     .addOnErrorListener(e -> {
                         textViewText2.setText(e.toString());
                         FirebaseCrashlytics.getInstance().recordException(e);
@@ -337,10 +375,12 @@ public class TranslationActivity extends AppCompatActivity {
         }
         else if (mode == TRANSLATION_MODE_TO_NATIVE){
 
+            imageViewMic2.setImageResource(R.drawable.ic_baseline_mic_none_64);
+
             translator = translatorFactory.getTranslator(currentTextSpeech.getContext(), language2, language1)
                     .addOnResultListener(s -> {
                         textViewText1.setText(s);
-                        textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, bundle, null);})
+                        textToSpeech2.speak(s, TextToSpeech.QUEUE_ADD, null, null);})
                     .addOnErrorListener(e -> {
                         textViewText1.setText(e.toString());
                         FirebaseCrashlytics.getInstance().recordException(e);
@@ -360,12 +400,16 @@ public class TranslationActivity extends AppCompatActivity {
         return mode == TRANSLATION_MODE_TO_FOREIGN?language1:language2;
     }
 
-    private void saveProperty(int value, String key){
+    private ImageView getCurrentMicView(){
+        return mode == TRANSLATION_MODE_TO_FOREIGN?imageViewMic1:imageViewMic2;
+    }
+
+    private void saveProperty(String value, String key){
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putInt(key, value);
+        editor.putString(key, value);
         editor.commit();
 
     }
@@ -374,7 +418,7 @@ public class TranslationActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        int language1Id = sharedPreferences.getInt(getString(R.string.language1_key), 0);
+        String language1Id = sharedPreferences.getString(getString(R.string.language1_key), null);
 
         Language language1 = Language.getById(language1Id);
 
@@ -384,7 +428,7 @@ public class TranslationActivity extends AppCompatActivity {
             setLanguage1(Language.defaultLanguage());
         }
 
-        int language2Id = sharedPreferences.getInt(getString(R.string.language2_key), 0);
+        String language2Id = sharedPreferences.getString(getString(R.string.language2_key), null);
 
         Language language2 = Language.getById(language2Id);
 

@@ -11,8 +11,25 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:id="@+id/settings_button"
-        android:src="@drawable/ic_baseline_settings_64"
-        />
+        android:src="@drawable/ic_baseline_settings_64"/>
+
+    <ImageView
+        android:id="@+id/replay1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_volume_up_24"
+        android:layout_marginTop="200dp"
+        android:paddingLeft="60dp"/>
+
+    <ImageView
+        android:id="@+id/replay2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_volume_up_24"
+        android:layout_marginTop="200dp"
+        android:layout_alignParentRight="true"
+        android:paddingBottom="90dp"
+        android:paddingRight="60dp"/>
 
     <TextView
         android:id="@+id/speech_text1"

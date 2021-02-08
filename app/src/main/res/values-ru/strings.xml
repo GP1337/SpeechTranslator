@@ -6,7 +6,7 @@
     <string name="default_offline_online_mode_title">Режим работы по умолчанию:</string>
 
     <string name="hint_listening">Распознавание…</string>
-    <string name="hint_start">Нажмите на микрофон и удерживайте, чтобы начать перевод</string>
+    <string name="hint_start">Нажмите на микрофон, чтобы начать перевод</string>
     <string name="hint_speak">Говорите</string>
 
     <string name="offline_mode_warning">Для работы без интернета необходимо загрузить пакеты языков</string>
@@ -15,6 +15,5 @@
     <string name="snackbar_warning_offline_action">Загрузить</string>
 
     <string name="online_disabled_toast">Онлайн режим не доступен</string>
-
 
 </resources>

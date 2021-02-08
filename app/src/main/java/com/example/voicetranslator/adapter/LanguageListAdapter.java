@@ -16,15 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.R;
 import com.example.voicetranslator.activity.LanguagesListActivity;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.common.model.RemoteModelManager;
+import com.google.mlkit.nl.translate.TranslateRemoteModel;
 
 import java.util.List;
 
 public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapter.LanguageViewHolder> {
 
-    private FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+    private RemoteModelManager modelManager = RemoteModelManager.getInstance();
     private List<Language> languagesList = Language.getAllLanguages();
     private int mode;
 
@@ -99,12 +99,12 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 
     private void downloadOnClickListener(View view, LanguageViewHolder languageViewHolder, Language language){
 
-        FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+        RemoteModelManager modelManager = RemoteModelManager.getInstance();
 
-        FirebaseTranslateRemoteModel remoteModel =
-                new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+        TranslateRemoteModel remoteModel =
+                new TranslateRemoteModel.Builder(language.getId()).build();
 
-        FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+        DownloadConditions conditions = new DownloadConditions .Builder()
                 .build();
 
         modelManager.download(remoteModel, conditions)

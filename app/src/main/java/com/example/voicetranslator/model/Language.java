@@ -1,12 +1,11 @@
 package com.example.voicetranslator.model;
 
-import androidx.preference.ListPreference;
-
 import com.example.voicetranslator.R;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateLanguage;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+
+import com.google.mlkit.common.model.RemoteModelManager;
+import com.google.mlkit.nl.translate.TranslateLanguage;
+import com.google.mlkit.nl.translate.TranslateRemoteModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,35 +18,35 @@ public class Language implements Serializable {
     private Locale locale;
     private String name;
 
-    private int id;
+    private String id;
     private int flagId;
     private boolean modelDownloaded;
     private boolean modelDownloading;
 
     private static List<Language> languageList;
-    private static FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+    private static RemoteModelManager modelManager = RemoteModelManager.getInstance();
 
     static {
 
         languageList = new ArrayList<>();
 
-        languageList.add(new Language(Locale.ENGLISH, FirebaseTranslateLanguage.EN, R.drawable.flag_en, "English"));
-        languageList.add(new Language(new Locale("ru", "RU"), FirebaseTranslateLanguage.RU, R.drawable.flag_ru, "Русский"));
-        languageList.add(new Language(Locale.FRENCH, FirebaseTranslateLanguage.FR, R.drawable.flag_fr, "Le français"));
-        languageList.add(new Language(Locale.GERMAN, FirebaseTranslateLanguage.DE, R.drawable.flag_fr, "Deutsch"));
-        languageList.add(new Language(Locale.ITALIAN, FirebaseTranslateLanguage.IT, R.drawable.flag_fr, "italiano"));
-        languageList.add(new Language(Locale.JAPANESE, FirebaseTranslateLanguage.JA, R.drawable.flag_fr, "日本語"));
+        languageList.add(new Language(Locale.ENGLISH, TranslateLanguage.ENGLISH, R.drawable.flag_en, "English"));
+        languageList.add(new Language(new Locale("ru", "RU"), TranslateLanguage.RUSSIAN, R.drawable.flag_ru, "Русский"));
+        languageList.add(new Language(Locale.FRENCH, TranslateLanguage.FRENCH, R.drawable.flag_fr, "Le français"));
+        languageList.add(new Language(Locale.GERMAN, TranslateLanguage.GERMAN, R.drawable.flag_fr, "Deutsch"));
+        languageList.add(new Language(Locale.ITALIAN, TranslateLanguage.ITALIAN, R.drawable.flag_fr, "italiano"));
+        languageList.add(new Language(Locale.JAPANESE, TranslateLanguage.JAPANESE, R.drawable.flag_fr, "日本語"));
 
     }
 
-    private Language(Locale locale, int id, int flagId, String name) {
+    private Language(Locale locale, String id, int flagId, String name) {
 
         this.locale = locale;
         this.id = id;
         this.flagId = flagId;
         this.name = name;
 
-        FirebaseTranslateRemoteModel remoteModel = new FirebaseTranslateRemoteModel.Builder(id).build();
+        TranslateRemoteModel remoteModel = new TranslateRemoteModel.Builder(id).build();
 
         Task<Boolean> booleanTask = modelManager.isModelDownloaded(remoteModel);
 
@@ -67,7 +66,7 @@ public class Language implements Serializable {
         return name;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -111,9 +110,9 @@ public class Language implements Serializable {
         return this != getEnglish();
     }
 
-    public static Language getById(int id){
+    public static Language getById(String id){
 
-        Optional<Language> optionalLanguage = languageList.stream().filter(language -> {return language.getId() == id;}).findFirst();
+        Optional<Language> optionalLanguage = languageList.stream().filter(language -> {return language.getId().equals(id);}).findFirst();
 
         return optionalLanguage.orElseGet(() -> null);
 

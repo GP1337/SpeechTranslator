@@ -11,8 +11,9 @@ public abstract class Translator {
     protected Language languageTarget;
     protected OnResultListener onResultListener;
     protected OnErrorListener onErrorListener;
-
     public abstract void translate(String text);
+
+    public abstract boolean useInternet();
 
     public Translator addOnResultListener(OnResultListener onResultListener){
 

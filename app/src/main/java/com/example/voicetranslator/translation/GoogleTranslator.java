@@ -25,7 +25,7 @@ public class GoogleTranslator extends Translator{
     @Override
     public void translate(String text) {
 
-        List<String> urlList = TranslatorUrlPool.getInstance(context).getPool();
+        List<String> urlList = TranslatorUrlPool.getInstance().getPool();
         String url = null;
 
         if (urlList.size() > 0){
@@ -44,13 +44,17 @@ public class GoogleTranslator extends Translator{
             return;
         }
 
-        // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 response -> onResultListener.onResult(response),
                 error -> onErrorListener.onError(error));
 
         queue.add(stringRequest);
 
+    }
+
+    @Override
+    public boolean useInternet() {
+        return true;
     }
 
 }

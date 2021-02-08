@@ -3,6 +3,7 @@ package com.example.voicetranslator.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,14 +19,14 @@ import com.example.voicetranslator.model.Language;
 import com.example.voicetranslator.adapter.LanguageListAdapter;
 import com.example.voicetranslator.R;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslateRemoteModel;
+import com.google.mlkit.common.model.RemoteModelManager;
+import com.google.mlkit.nl.translate.TranslateRemoteModel;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class LanguagesListActivity extends AppCompatActivity {
 
-    private FirebaseModelManager modelManager = FirebaseModelManager.getInstance();
+    private RemoteModelManager modelManager = RemoteModelManager.getInstance();
     private RecyclerView recyclerView;
     private int mode;
 
@@ -127,8 +128,8 @@ public class LanguagesListActivity extends AppCompatActivity {
 
                 if (language.isModelDownloaded()) {
 
-                    FirebaseTranslateRemoteModel model =
-                            new FirebaseTranslateRemoteModel.Builder(language.getId()).build();
+                    TranslateRemoteModel model =
+                            new TranslateRemoteModel.Builder(language.getId()).build();
 
                     modelManager.deleteDownloadedModel(model)
                             .addOnSuccessListener(v -> {
@@ -149,6 +150,7 @@ public class LanguagesListActivity extends AppCompatActivity {
             public void onChildDraw (@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive){
 
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addBackgroundColor(ContextCompat.getColor(LanguagesListActivity.this, R.color.bar))
                         .addActionIcon(R.drawable.ic_baseline_delete_sweep_64)
                         .create()
                         .decorate();

@@ -5,12 +5,13 @@ import android.content.Context;
 import com.example.voicetranslator.model.Language;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage;
-import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
+
+import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.nl.translate.TranslatorOptions;
 
 public class FirebaseTranslator extends Translator{
 
-    private com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator translator;
+    private com.google.mlkit.nl.translate.Translator translator;
 
     public FirebaseTranslator(Context context, Language languageSrc, Language languageTarget) {
 
@@ -20,13 +21,13 @@ public class FirebaseTranslator extends Translator{
 
         FirebaseApp.initializeApp(context);
 
-        FirebaseTranslatorOptions options =
-                new FirebaseTranslatorOptions.Builder()
+        TranslatorOptions options =
+                new TranslatorOptions.Builder()
                         .setSourceLanguage(languageSrc.getId())
                         .setTargetLanguage(languageTarget.getId())
                         .build();
 
-        this.translator = FirebaseNaturalLanguage.getInstance().getTranslator(options);
+        this.translator = Translation.getClient(options);;
 
     }
 
@@ -38,5 +39,10 @@ public class FirebaseTranslator extends Translator{
         task.addOnSuccessListener(s -> onResultListener.onResult(s));
         task.addOnFailureListener(e -> onErrorListener.onError(e));
 
+    }
+
+    @Override
+    public boolean useInternet() {
+        return false;
     }
 }

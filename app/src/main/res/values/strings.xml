@@ -9,7 +9,7 @@
     <string name="mode_offline">offline</string>
 
     <string name="hint_listening">Listening…</string>
-    <string name="hint_start">Tap and hold the microphone to start</string>
+    <string name="hint_start">Tap the microphone to start</string>
     <string name="hint_speak">Speak</string>
 
     <string name="offline_mode_warning">Download packages for offline mode</string>

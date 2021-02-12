@@ -33,9 +33,10 @@ public class Language implements Serializable {
         languageList.add(new Language(Locale.ENGLISH, TranslateLanguage.ENGLISH, R.drawable.flag_en, "English"));
         languageList.add(new Language(new Locale("ru", "RU"), TranslateLanguage.RUSSIAN, R.drawable.flag_ru, "Русский"));
         languageList.add(new Language(Locale.FRENCH, TranslateLanguage.FRENCH, R.drawable.flag_fr, "Le français"));
-        languageList.add(new Language(Locale.GERMAN, TranslateLanguage.GERMAN, R.drawable.flag_fr, "Deutsch"));
-        languageList.add(new Language(Locale.ITALIAN, TranslateLanguage.ITALIAN, R.drawable.flag_fr, "italiano"));
-        languageList.add(new Language(Locale.JAPANESE, TranslateLanguage.JAPANESE, R.drawable.flag_fr, "日本語"));
+        languageList.add(new Language(Locale.GERMAN, TranslateLanguage.GERMAN, R.drawable.flag_de, "Deutsch"));
+        languageList.add(new Language(Locale.ITALIAN, TranslateLanguage.ITALIAN, R.drawable.flag_it, "italiano"));
+        languageList.add(new Language(Locale.JAPANESE, TranslateLanguage.JAPANESE, R.drawable.flag_ja, "日本語"));
+        languageList.add(new Language(new Locale("tr", "TR"), TranslateLanguage.TURKISH, R.drawable.flag_tr, "Türk"));
 
     }
 

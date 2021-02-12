@@ -1,7 +1,5 @@
 package com.example.voicetranslator.translation;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
